@@ -13,7 +13,7 @@ const nextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     minimumCacheTTL: 31536000, // Cache images for 1 year
     formats: ['image/webp'],
-    domains: ['localhost', process.env.NEXT_PUBLIC_SUPABASE_URL],
+    domains: ['localhost', 'efjhzxkrgobamihluyok.supabase.co'],
   },
   headers: async () => [
     {
@@ -36,7 +36,9 @@ const nextConfig = {
     },
   ],
   experimental: {
-    serverActions: true,
+    serverActions: {
+      allowedOrigins: ['*'],
+    },
   },
 };
 
