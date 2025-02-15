@@ -3,16 +3,17 @@ import { cookies } from 'next/headers'
 import Image from 'next/image'
 import { Metadata } from 'next'
 
-interface PageParams {
+interface PageParams extends Promise<any> {
   slug: string
 }
 
 interface Props {
-  params: PageParams
+  params: Promise<{ slug: string }>
   searchParams?: { [key: string]: string | string[] | undefined }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const resolvedParams = await params
   const supabase = createServerComponentClient({
     cookies,
   })
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data: blog } = await supabase
     .from('blogs')
     .select('title,excerpt')
-    .eq('slug', params.slug)
+    .eq('slug', resolvedParams.slug)
     .maybeSingle()
 
   return {
@@ -30,6 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPost({ params }: Props) {
+  const resolvedParams = await params
   const supabase = createServerComponentClient({
     cookies,
   })
@@ -37,7 +39,7 @@ export default async function BlogPost({ params }: Props) {
   const { data: blog, error } = await supabase
     .from('blogs')
     .select('*')
-    .eq('slug', params.slug)
+    .eq('slug', resolvedParams.slug)
     .maybeSingle()
 
   if (error) {
