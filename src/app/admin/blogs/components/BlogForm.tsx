@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import Editor from '@/components/Editor'
+import Editor from '@/components/RichEditor'
 import ImageUpload from '@/components/ImageUpload'
 
 interface BlogFormProps {
