@@ -2,6 +2,15 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 
+interface Blog {
+  id: string
+  title: string
+  slug: string
+  excerpt: string
+  image_url: string
+  created_at: string
+}
+
 export default async function Home() {
   const supabase = createServerComponentClient({ cookies })
   const { data: blogs, error } = await supabase
@@ -21,7 +30,7 @@ export default async function Home() {
         <p className="text-center text-gray-600">No blogs available.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {blogs.map((blog: any) => (
+          {blogs.map((blog: Blog) => (
             <Link key={blog.id} href={`/blog/${blog.slug}`}>
               <div className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition">
                 <img 

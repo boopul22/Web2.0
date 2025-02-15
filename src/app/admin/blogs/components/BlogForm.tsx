@@ -19,6 +19,13 @@ interface BlogFormProps {
   }
 }
 
+interface SupabaseError {
+  message: string
+  details?: string
+  hint?: string
+  code?: string
+}
+
 export default function BlogForm({ initialData }: BlogFormProps) {
   const router = useRouter()
   const [title, setTitle] = useState(initialData?.title || '')
@@ -77,9 +84,10 @@ export default function BlogForm({ initialData }: BlogFormProps) {
 
       router.push('/admin')
       router.refresh()
-    } catch (err: any) {
-      console.error('Error saving blog:', err)
-      setError(err.message || 'Failed to save blog')
+    } catch (err: unknown) {
+      const error = err as SupabaseError
+      console.error('Error saving blog:', error)
+      setError(error.message || 'Failed to save blog')
     } finally {
       setIsLoading(false)
     }
