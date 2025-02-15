@@ -3,20 +3,16 @@ import { cookies } from 'next/headers'
 import Image from 'next/image'
 import { Metadata } from 'next'
 
-type PageProps = {
-  params: {
-    slug: string
-  }
+interface PageParams {
+  slug: string
+}
+
+interface Props {
+  params: PageParams
   searchParams?: { [key: string]: string | string[] | undefined }
 }
 
-type GenerateMetadataProps = {
-  params: {
-    slug: string
-  }
-}
-
-export async function generateMetadata({ params }: GenerateMetadataProps): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = createServerComponentClient({
     cookies,
   })
@@ -33,7 +29,7 @@ export async function generateMetadata({ params }: GenerateMetadataProps): Promi
   }
 }
 
-export default async function BlogPost({ params }: PageProps) {
+export default async function BlogPost({ params }: Props) {
   const supabase = createServerComponentClient({
     cookies,
   })
