@@ -2,6 +2,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Metadata } from 'next'
 
 interface Blog {
   id: string
@@ -13,14 +14,20 @@ interface Blog {
   author: string
 }
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Wavy Blog - Latest Articles and Insights',
   description: 'Discover the latest articles and insights on our blog. Stay updated with trending topics and expert opinions.',
   keywords: 'blog, articles, insights, trending topics',
 }
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function Home() {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = createServerComponentClient({
+    cookies,
+  })
+  
   const { data: blogs, error } = await supabase
     .from('blogs')
     .select('*')
@@ -55,13 +62,21 @@ export default async function Home() {
                 {blogs.map((blog: Blog) => (
                   <article key={blog.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full">
                     <Link href={`/blog/${blog.slug}`} className="block h-full">
-                      <div className="relative h-56 w-full">
-                        <Image
-                          src={blog.image_url || '/placeholder.jpg'}
-                          alt={blog.title}
-                          fill
-                          className="object-cover"
-                        />
+                      <div className="relative aspect-[16/9]">
+                        {blog.image_url ? (
+                          <Image
+                            src={blog.image_url}
+                            alt={blog.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover"
+                            unoptimized
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                            <span className="text-gray-400">No image</span>
+                          </div>
+                        )}
                       </div>
                       <div className="p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
@@ -71,13 +86,14 @@ export default async function Home() {
                           {blog.excerpt}
                         </p>
                         <div className="flex items-center gap-3 mt-auto">
-                          <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+                          <div className="relative w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
                             <Image
                               src="/default-avatar.png"
-                              alt="Author"
+                              alt={`${blog.author || 'Anonymous'}'s avatar`}
                               width={32}
                               height={32}
-                              className="object-cover"
+                              className="object-cover w-full h-full"
+                              unoptimized
                             />
                           </div>
                           <div>
