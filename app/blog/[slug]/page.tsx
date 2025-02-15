@@ -10,7 +10,13 @@ type PageProps = {
   searchParams?: { [key: string]: string | string[] | undefined }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+type GenerateMetadataProps = {
+  params: {
+    slug: string
+  }
+}
+
+export async function generateMetadata({ params }: GenerateMetadataProps): Promise<Metadata> {
   const supabase = createServerComponentClient({
     cookies,
   })
