@@ -1,16 +1,27 @@
-import "./globals.css";
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import Navigation from './components/Navigation'
 
-export const metadata = {
-  title: "My Supabase Blog",
-  description: "A simple blog built with Supabase and Next.js"
-};
+const inter = Inter({ subsets: ['latin'] })
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const metadata: Metadata = {
+  title: 'Wavy Blog - Latest Articles and Insights',
+  description: 'Discover the latest articles and insights on our blog. Stay updated with trending topics and expert opinions.',
+  keywords: 'blog, articles, insights, trending topics',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
-      <body>
+      <body className={inter.className}>
+        <Navigation />
         {children}
       </body>
     </html>
-  );
+  )
 }

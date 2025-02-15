@@ -12,6 +12,9 @@ const config: Config = {
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+  			navy: {
+  				900: '#1a1f36',
+  			},
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
@@ -62,6 +65,7 @@ const config: Config = {
     require("tailwindcss-animate"),
     require('@tailwindcss/forms'),
     require('@tailwindcss/typography'),
+    require('@tailwindcss/line-clamp'),
   ],
 };
 export default config;
