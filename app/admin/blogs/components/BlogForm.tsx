@@ -3,8 +3,8 @@
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import RichEditor from './RichEditor'
-import ImageUpload from './ImageUpload'
+import Editor from '../../../components/RichEditor'
+import ImageUpload from '../../../components/ImageUpload'
 
 interface BlogFormProps {
   initialData?: {
@@ -16,7 +16,17 @@ interface BlogFormProps {
     category: string
     readTime: number
     slug?: string
+    seoTitle?: string
+    seoDescription?: string
+    status?: 'draft' | 'published'
   }
+}
+
+interface SupabaseError {
+  message: string
+  details?: string
+  hint?: string
+  code?: string
 }
 
 export default function BlogForm({ initialData }: BlogFormProps) {
@@ -27,12 +37,15 @@ export default function BlogForm({ initialData }: BlogFormProps) {
   const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || '')
   const [category, setCategory] = useState(initialData?.category || '')
   const [readTime, setReadTime] = useState(initialData?.readTime || 5)
+  const [seoTitle, setSeoTitle] = useState(initialData?.seoTitle || '')
+  const [seoDescription, setSeoDescription] = useState(initialData?.seoDescription || '')
+  const [status, setStatus] = useState<'draft' | 'published'>(initialData?.status || 'draft')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const supabase = createClientComponentClient()
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent, saveAsDraft = false) {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
@@ -43,6 +56,17 @@ export default function BlogForm({ initialData }: BlogFormProps) {
       } = await supabase.auth.getUser()
 
       if (!user) throw new Error('Not authenticated')
+
+      // Validate required fields for publishing
+      if (!saveAsDraft) {
+        if (!title) throw new Error('Title is required')
+        if (!content) throw new Error('Content is required')
+        if (!excerpt) throw new Error('Excerpt is required')
+        if (!imageUrl) throw new Error('Featured image is required')
+        if (!category) throw new Error('Category is required')
+        if (!seoTitle) throw new Error('SEO title is required')
+        if (!seoDescription) throw new Error('SEO description is required')
+      }
 
       const slug = title
         .toLowerCase()
@@ -58,6 +82,10 @@ export default function BlogForm({ initialData }: BlogFormProps) {
         read_time: `${readTime} min`,
         author_id: user.id,
         slug,
+        seo_title: seoTitle,
+        seo_description: seoDescription,
+        status: saveAsDraft ? 'draft' : 'published',
+        published_at: saveAsDraft ? null : new Date().toISOString()
       }
 
       if (initialData?.id) {
@@ -77,16 +105,17 @@ export default function BlogForm({ initialData }: BlogFormProps) {
 
       router.push('/admin')
       router.refresh()
-    } catch (err: any) {
-      console.error('Error saving blog:', err)
-      setError(err.message || 'Failed to save blog')
+    } catch (err: unknown) {
+      const error = err as Error
+      console.error('Error saving blog:', error)
+      setError(error.message || 'Failed to save blog')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-6">
+    <form onSubmit={(e) => handleSubmit(e, false)} className="max-w-4xl mx-auto space-y-6">
       {error && (
         <div className="bg-red-50 text-red-500 p-4 rounded-lg">
           {error}
@@ -125,10 +154,9 @@ export default function BlogForm({ initialData }: BlogFormProps) {
         <label htmlFor="content" className="block text-sm font-medium text-gray-700">
           Content
         </label>
-        <RichEditor
+        <Editor
           content={content}
           onChange={setContent}
-          placeholder="Write your blog post content here..."
         />
       </div>
 
@@ -181,13 +209,59 @@ export default function BlogForm({ initialData }: BlogFormProps) {
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
-      >
-        {isLoading ? 'Saving...' : initialData ? 'Update Blog' : 'Create Blog'}
-      </button>
+      {/* SEO Section */}
+      <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+        <h3 className="font-medium text-gray-900">SEO Settings</h3>
+        
+        <div className="space-y-2">
+          <label htmlFor="seoTitle" className="block text-sm font-medium text-gray-700">
+            SEO Title
+          </label>
+          <input
+            type="text"
+            id="seoTitle"
+            value={seoTitle}
+            onChange={(e) => setSeoTitle(e.target.value)}
+            className="block w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
+            maxLength={60}
+          />
+          <p className="text-sm text-gray-500">{seoTitle.length}/60 characters</p>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="seoDescription" className="block text-sm font-medium text-gray-700">
+            SEO Description
+          </label>
+          <textarea
+            id="seoDescription"
+            value={seoDescription}
+            onChange={(e) => setSeoDescription(e.target.value)}
+            rows={3}
+            className="block w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
+            maxLength={160}
+          />
+          <p className="text-sm text-gray-500">{seoDescription.length}/160 characters</p>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-4">
+        <button
+          type="button"
+          onClick={(e) => handleSubmit(e, true)}
+          disabled={isLoading}
+          className="flex-1 rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+        >
+          {isLoading && status === 'draft' ? 'Saving...' : 'Save as Draft'}
+        </button>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+        >
+          {isLoading && status === 'published' ? 'Publishing...' : 'Publish'}
+        </button>
+      </div>
     </form>
   )
 } 

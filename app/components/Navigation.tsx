@@ -1,25 +1,34 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import { Search, Menu, X } from 'lucide-react'
+import { cn } from '../../lib/utils'
 
-interface MenuItem {
-  href: string
-  label: string
-  ariaLabel: string
-}
+const menuItems = [
+  { href: '/', label: 'Home' },
+  { href: '/header-styles', label: 'Header Styles' },
+  { href: '/post-features', label: 'Post Features' },
+  { href: '/features', label: 'Features' },
+  { href: '/contact', label: 'Contact' },
+]
 
-const Navigation = () => {
+export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [hasScrolled, setHasScrolled] = useState(false)
   const pathname = usePathname()
 
-  const menuItems: MenuItem[] = [
-    { href: '/', label: 'Home', ariaLabel: 'Go to homepage' },
-    { href: '/blog', label: 'Blog', ariaLabel: 'Read our blog posts' },
-    { href: '/about', label: 'About', ariaLabel: 'Learn more about us' },
-    { href: '/contact', label: 'Contact', ariaLabel: 'Get in touch with us' },
-  ]
+  useEffect(() => {
+    const handleScroll = () => {
+      setHasScrolled(window.scrollY > 20)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    handleScroll() // Check initial scroll position
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -29,123 +38,168 @@ const Navigation = () => {
   }
 
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50" role="navigation" aria-label="Main navigation">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          {/* Logo and Brand */}
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center" aria-label="Go to homepage">
-              <div className="w-8 h-8 mr-2">
-                <svg viewBox="0 0 24 24" className="w-full h-full text-pink-500 fill-current">
-                  <path d="M3.516 3.516c4.686-4.686 12.284-4.686 16.97 0 4.686 4.686 4.686 12.284 0 16.97-4.686 4.686-12.284 4.686-16.97 0-4.686-4.686-4.686-12.284 0-16.97zm13.789 2.06c-3.732-3.732-9.875-3.732-13.607 0-3.732 3.732-3.732 9.875 0 13.607 3.732 3.732 9.875 3.732 13.607 0 3.732-3.732 3.732-9.875 0-13.607z"/>
-                </svg>
-              </div>
-              <span className="text-xl font-bold text-gray-900">Wavy</span>
-            </Link>
-          </div>
+    <header 
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
+        hasScrolled && "bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm"
+      )}
+    >
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-16 lg:h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center">
+            <div className="flex items-center space-x-2">
+              <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                <path
+                  d="M8 4C8 2.89543 8.89543 2 10 2H22C23.1046 2 24 2.89543 24 4V28C24 29.1046 23.1046 30 22 30H10C8.89543 30 8 29.1046 8 28V4Z"
+                  className="fill-pink-500"
+                />
+                <path
+                  d="M10 8C10 6.89543 10.8954 6 12 6H20C21.1046 6 22 6.89543 22 8V24C22 25.1046 21.1046 26 20 26H12C10.8954 26 10 25.1046 10 24V8Z"
+                  className="fill-pink-600"
+                />
+              </svg>
+              <span className={cn(
+                "text-2xl font-bold transition-colors duration-300",
+                hasScrolled ? "text-gray-900" : "text-white"
+              )}>wavy</span>
+              <span className="text-2xl text-pink-500">.</span>
+            </div>
+          </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-8">
+          <nav className="hidden lg:flex lg:items-center lg:space-x-8">
             {menuItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={cn(
+                  "text-sm font-medium transition-colors",
                   isActive(item.href)
-                    ? 'text-pink-500'
-                    : 'text-gray-600 hover:text-pink-500'
+                    ? "text-pink-500"
+                    : hasScrolled 
+                      ? "text-gray-600 hover:text-pink-500" 
+                      : "text-white/90 hover:text-white"
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Desktop Right Section */}
+          <div className="hidden lg:flex lg:items-center lg:space-x-4">
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className={cn(
+                "p-2 transition-colors",
+                hasScrolled 
+                  ? "text-gray-600 hover:text-pink-500" 
+                  : "text-white/90 hover:text-white"
+              )}
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+            <Link
+              href="/subscribe"
+              className={cn(
+                "inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-full transition-colors",
+                hasScrolled
+                  ? "text-white bg-pink-500 hover:bg-pink-600"
+                  : "text-pink-500 bg-white hover:bg-gray-100"
+              )}
+            >
+              Subscribe
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="flex items-center lg:hidden">
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className={cn(
+                "p-2 transition-colors",
+                hasScrolled 
+                  ? "text-gray-600 hover:text-pink-500" 
+                  : "text-white/90 hover:text-white"
+              )}
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className={cn(
+                "p-2 transition-colors ml-2",
+                hasScrolled 
+                  ? "text-gray-600 hover:text-pink-500" 
+                  : "text-white/90 hover:text-white"
+              )}
+              aria-label="Menu"
+            >
+              {isOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Search Overlay */}
+      {isSearchOpen && (
+        <div className="fixed inset-0 bg-white/95 backdrop-blur-md z-50 p-4">
+          <div className="container mx-auto flex items-center justify-between">
+            <input
+              type="search"
+              placeholder="Search..."
+              className="w-full text-lg border-none focus:outline-none focus:ring-0 bg-transparent placeholder-gray-400"
+              autoFocus
+            />
+            <button
+              onClick={() => setIsSearchOpen(false)}
+              className="p-2 text-gray-600 hover:text-pink-500 transition-colors"
+              aria-label="Close search"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div className="lg:hidden">
+          <div className={cn(
+            "px-2 pt-2 pb-3 space-y-1 border-b transition-colors duration-300",
+            hasScrolled ? "bg-white/95 backdrop-blur-md border-gray-200/50" : "bg-white border-gray-100"
+          )}>
+            {menuItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`block px-3 py-2 text-base font-medium rounded-md ${
+                  isActive(item.href)
+                    ? 'text-pink-500 bg-pink-50'
+                    : 'text-gray-600 hover:text-pink-500 hover:bg-pink-50'
                 }`}
-                aria-label={item.ariaLabel}
-                aria-current={isActive(item.href) ? 'page' : undefined}
+                onClick={() => setIsOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
             <Link
               href="/subscribe"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-pink-500 hover:bg-pink-600 transition-colors"
-              aria-label="Subscribe to our newsletter"
+              className="block w-full text-center px-4 py-2 text-sm font-medium text-white bg-pink-500 rounded-full hover:bg-pink-600 transition-colors mt-4"
+              onClick={() => setIsOpen(false)}
             >
               Subscribe
             </Link>
           </div>
-
-          {/* Mobile menu button */}
-          <div className="flex items-center md:hidden">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-              aria-controls="mobile-menu"
-              aria-expanded={isOpen}
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              <span className="sr-only">{isOpen ? 'Close main menu' : 'Open main menu'}</span>
-              {/* Icon when menu is closed */}
-              <svg
-                className={`${isOpen ? 'hidden' : 'block'} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              {/* Icon when menu is open */}
-              <svg
-                className={`${isOpen ? 'block' : 'hidden'} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
         </div>
-      </div>
-
-      {/* Mobile menu */}
-      <div
-        className={`${isOpen ? 'block' : 'hidden'} md:hidden`}
-        id="mobile-menu"
-        role="menu"
-        aria-orientation="vertical"
-        aria-labelledby="mobile-menu-button"
-      >
-        <div className="px-2 pt-2 pb-3 space-y-1">
-          {menuItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive(item.href)
-                  ? 'text-pink-500 bg-gray-50'
-                  : 'text-gray-600 hover:text-pink-500 hover:bg-gray-50'
-              }`}
-              aria-label={item.ariaLabel}
-              aria-current={isActive(item.href) ? 'page' : undefined}
-              role="menuitem"
-              onClick={() => setIsOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <Link
-            href="/subscribe"
-            className="block w-full text-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-pink-500 hover:bg-pink-600"
-            aria-label="Subscribe to our newsletter"
-            role="menuitem"
-            onClick={() => setIsOpen(false)}
-          >
-            Subscribe
-          </Link>
-        </div>
-      </div>
-    </nav>
+      )}
+    </header>
   )
-}
-
-export default Navigation 
+} 
