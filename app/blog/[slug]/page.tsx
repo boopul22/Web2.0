@@ -126,7 +126,7 @@ export default async function BlogPost({ params }: Props) {
     <>
       <SchemaMarkup type="BlogPosting" data={schema} />
       <ViewCounter slug={blog.slug} />
-      <div className="min-h-screen bg-transparent dark:bg-transparent py-4 sm:py-6 lg:py-8 px-3 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 py-4 sm:py-6 lg:py-8 px-3 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <Breadcrumb items={[
             { name: 'Home', url: '/' },
@@ -135,9 +135,9 @@ export default async function BlogPost({ params }: Props) {
           ]} />
           
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(250px,280px)_1fr] gap-4 lg:gap-8 mt-4">
-            <aside className="hidden lg:block space-y-4 lg:space-y-8">
-              <Card className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-zinc-200/50 dark:border-zinc-800/50">
-                <CardContent className="p-4 sm:p-6 lg:p-8">
+            <aside className="hidden lg:block space-y-4 lg:space-y-8 lg:sticky lg:top-24">
+              <Card className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
+                <CardContent className="p-4 sm:p-6">
                   <TableOfContents />
                 </CardContent>
               </Card>
@@ -147,33 +147,39 @@ export default async function BlogPost({ params }: Props) {
               )}
             </aside>
 
-            <article className="prose prose-zinc dark:prose-invert max-w-none">
-              <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl px-4 sm:px-8 lg:px-16 py-8 lg:py-16 border border-zinc-200/50 dark:border-zinc-800/50">
+            <article className="prose prose-zinc dark:prose-invert max-w-none lg:prose-lg">
+              <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl px-4 sm:px-8 lg:px-16 py-8 lg:py-16 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
                 {blog.image_url ? (
-                  <div className="relative w-full h-64 sm:h-80 lg:h-96 mb-8 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
+                  <div className="relative w-full aspect-[21/9] mb-8 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 group">
                     <Image
                       src={blog.image_url}
                       alt={blog.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
                       priority
                       unoptimized
                     />
-                    <div className="absolute inset-0 bg-gray-900/10 dark:bg-gray-900/20" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/20 to-transparent" />
                   </div>
                 ) : (
-                  <div className="relative w-full h-64 sm:h-80 lg:h-96 mb-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                  <div className="relative w-full aspect-[21/9] mb-8 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
                     <ImageOff className="w-12 h-12 text-gray-400" />
                     <span className="sr-only">No image available</span>
                   </div>
                 )}
-                <header className="text-center mb-8 lg:mb-12">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">{blog.title}</h1>
-                  <div className="flex items-center justify-center gap-2 text-muted-foreground mb-6">
-                    <span>{blog.author}</span>
-                    <span>•</span>
-                    <time dateTime={blog.created_at}>
+                
+                <header className="text-center mb-12 lg:mb-16">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">
+                    {blog.title}
+                  </h1>
+                  <div className="flex items-center justify-center gap-3 text-muted-foreground mb-6">
+                    <span className="font-medium">{blog.author}</span>
+                    <span className="text-gray-300 dark:text-gray-700">•</span>
+                    <time 
+                      dateTime={blog.created_at}
+                      className="text-sm"
+                    >
                       {new Date(blog.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
@@ -182,24 +188,34 @@ export default async function BlogPost({ params }: Props) {
                     </time>
                     {blog.difficulty && (
                       <>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
+                        <span className="text-gray-300 dark:text-gray-700">•</span>
+                        <span className="flex items-center gap-1" title={`Difficulty: ${blog.difficulty} out of 5`}>
                           {Array.from({ length: blog.difficulty }).map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-current" />
+                            <Star key={i} className="w-4 h-4 fill-current text-pink-500" />
+                          ))}
+                          {Array.from({ length: 5 - blog.difficulty }).map((_, i) => (
+                            <Star key={i} className="w-4 h-4 fill-current text-gray-200 dark:text-gray-800" />
                           ))}
                         </span>
                       </>
                     )}
                   </div>
-                  <p className="text-lg text-muted-foreground">{blog.excerpt}</p>
+                  <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                    {blog.excerpt}
+                  </p>
                 </header>
 
                 <div 
-                  className="prose prose-zinc dark:prose-invert max-w-none"
+                  className="prose prose-zinc dark:prose-invert max-w-none lg:prose-lg
+                    prose-headings:scroll-mt-20
+                    prose-a:text-pink-500 prose-a:no-underline hover:prose-a:underline
+                    prose-img:rounded-lg prose-img:shadow-md
+                    prose-blockquote:border-l-pink-500
+                    prose-code:text-pink-500 prose-code:before:content-none prose-code:after:content-none"
                   dangerouslySetInnerHTML={{ __html: blog.content }}
                 />
                 
-                <div className="mt-8 pt-8 border-t">
+                <div className="mt-12 pt-8 border-t border-gray-200/50 dark:border-gray-800/50">
                   <SocialShare 
                     url={postUrl}
                     title={blog.title}
