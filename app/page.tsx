@@ -27,7 +27,7 @@ export const revalidate = 3600 // Revalidate every hour
 
 export default async function HomePage() {
   return (
-    <main className="relative min-h-screen bg-[#5CCFB9]">
+    <main className="relative min-h-screen">
       {/* Content wrapper */}
       <div className="relative z-0 w-full">
         <div className="container mx-auto px-4 max-w-[1200px]">
