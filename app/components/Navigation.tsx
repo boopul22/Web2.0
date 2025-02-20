@@ -1,9 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { ChevronDown } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+// Dynamically import ChevronDown with SSR disabled to prevent hydration issues
+const DynamicChevronDown = dynamic(() => import('lucide-react').then(mod => mod.ChevronDown), {
+  ssr: false,
+  loading: () => <span className="w-4 h-4 inline-block" />
+})
 
 const menuItems = [
   { href: '/', label: 'Home' },
@@ -29,7 +35,13 @@ const menuItems = [
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+
+  useEffect(() => {
+    setMounted(true)
+    return () => setMounted(false)
+  }, [])
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -73,8 +85,10 @@ export default function Navigation() {
                   }`}
                 >
                   <span>{item.label}</span>
-                  {item.hasDropdown && (
-                    <ChevronDown className="w-4 h-4" />
+                  {item.hasDropdown && mounted && (
+                    <span className="flex items-center">
+                      <DynamicChevronDown className="w-4 h-4" />
+                    </span>
                   )}
                 </Link>
               ))}
@@ -137,8 +151,10 @@ export default function Navigation() {
                   onClick={() => setIsOpen(false)}
                 >
                   <span>{item.label}</span>
-                  {item.hasDropdown && (
-                    <ChevronDown className="w-5 h-5" />
+                  {item.hasDropdown && mounted && (
+                    <span className="flex items-center">
+                      <DynamicChevronDown className="w-5 h-5" />
+                    </span>
                   )}
                 </Link>
               ))}
