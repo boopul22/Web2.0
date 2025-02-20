@@ -66,8 +66,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPost({ params }: Props) {
   const resolvedParams = await params
+  const cookieStore = cookies()
   const supabase = createServerComponentClient({
-    cookies,
+    cookies: () => cookieStore,
   })
   
   const [{ data: blog, error }, { data: popularArticles }] = await Promise.all([
@@ -149,25 +150,9 @@ export default async function BlogPost({ params }: Props) {
 
             <article className="prose prose-zinc dark:prose-invert max-w-none lg:prose-lg">
               <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl px-4 sm:px-8 lg:px-16 py-8 lg:py-16 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
-                {blog.image_url ? (
-                  <div className="relative w-full aspect-[21/9] mb-8 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 group">
-                    <Image
-                      src={blog.image_url}
-                      alt={blog.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      priority
-                      unoptimized
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/20 to-transparent" />
-                  </div>
-                ) : (
-                  <div className="relative w-full aspect-[21/9] mb-8 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
-                    <ImageOff className="w-12 h-12 text-gray-400" />
-                    <span className="sr-only">No image available</span>
-                  </div>
-                )}
+                <div className="relative w-full aspect-[21/9] mb-8 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                  <span className="text-gray-400 dark:text-gray-500">No image available</span>
+                </div>
                 
                 <header className="text-center mb-12 lg:mb-16">
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300">

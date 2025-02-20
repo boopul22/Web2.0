@@ -20,7 +20,7 @@ export async function uploadImage(file: File) {
     // Create unique file name
     const fileExt = file.name.split('.').pop()
     const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
-    const filePath = `uploads/${fileName.replace(/\s/g, '-').toLowerCase()}`
+    const filePath = `blog-images/${fileName.replace(/\s/g, '-').toLowerCase()}`
 
     // Check if bucket exists and create if it doesn't
     const { data: buckets } = await supabase.storage.listBuckets()

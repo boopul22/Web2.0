@@ -13,16 +13,22 @@ interface Post {
 export default function Footer() {
   const recentPosts: Post[] = [
     {
-      title: "Modern and colorful style of caricatures created by AI",
-      date: "October 21, 2023",
-      slug: "modern-caricatures-ai",
-      thumbnail: "/images/cat-thumbnail.jpg"
+      title: "Understanding Web Performance",
+      slug: "understanding-web-performance",
+      date: "March 15, 2024",
+      thumbnail: "/images/web-performance-thumbnail.jpg"
     },
     {
-      title: "More effective schedules in remote work",
-      date: "October 21, 2023",
-      slug: "effective-remote-schedules",
-      thumbnail: "/images/clock-thumbnail.jpg"
+      title: "The Future of AI",
+      slug: "future-of-ai",
+      date: "March 10, 2024",
+      thumbnail: "/images/ai-thumbnail.jpg"
+    },
+    {
+      title: "Building Scalable Systems",
+      slug: "building-scalable-systems",
+      date: "March 5, 2024",
+      thumbnail: "/images/scalable-systems-thumbnail.jpg"
     }
   ];
 
@@ -106,17 +112,9 @@ export default function Footer() {
                   href={`/blog/${post.slug}`}
                   className="flex gap-4 group"
                 >
-                  {post.thumbnail && (
-                    <div className="flex-shrink-0">
-                      <Image
-                        src={post.thumbnail}
-                        alt={post.title}
-                        width={80}
-                        height={80}
-                        className="rounded-lg object-cover"
-                      />
-                    </div>
-                  )}
+                  <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-400 text-xs">No image</span>
+                  </div>
                   <div>
                     <h4 className="text-gray-800 group-hover:text-pink-600 transition-colors">
                       {post.title}

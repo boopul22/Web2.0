@@ -6,6 +6,8 @@ create table if not exists public.posts (
   excerpt text,
   featured_image text,
   status text not null check (status in ('draft', 'published')),
+  category text not null check (category in ('Travel', 'Lifestyle', 'Health')),
+  read_time integer not null default 1,
   seo_title text,
   seo_description text,
   slug text not null unique,
@@ -14,7 +16,8 @@ create table if not exists public.posts (
   updated_at timestamptz default now() not null,
   published_at timestamptz,
   
-  constraint posts_slug_length check (char_length(slug) >= 3)
+  constraint posts_slug_length check (char_length(slug) >= 3),
+  constraint posts_read_time_positive check (read_time > 0)
 );
 
 -- Create index for faster lookups

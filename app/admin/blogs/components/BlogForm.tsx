@@ -57,6 +57,9 @@ export default function BlogForm({ initialData }: BlogFormProps) {
 
       if (!user) throw new Error('Not authenticated')
 
+      // Get user's full name from metadata or use email as fallback
+      const authorName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Anonymous'
+
       // Validate required fields for publishing
       if (!saveAsDraft) {
         if (!title) throw new Error('Title is required')
@@ -81,6 +84,7 @@ export default function BlogForm({ initialData }: BlogFormProps) {
         category,
         read_time: `${readTime} min`,
         author_id: user.id,
+        author: authorName,
         slug,
         seo_title: seoTitle,
         seo_description: seoDescription,

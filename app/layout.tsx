@@ -8,9 +8,18 @@ import { Toaster } from "./components/ui/toaster"
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('http://localhost:3000'),
   title: 'Wavy Blog - Latest Articles and Insights',
   description: 'Discover the latest articles and insights on our blog. Stay updated with trending topics and expert opinions.',
   keywords: 'blog, articles, insights, trending topics',
+  openGraph: {
+    title: 'Wavy Blog - Latest Articles and Insights',
+    description: 'Discover the latest articles and insights on our blog. Stay updated with trending topics and expert opinions.',
+    url: 'http://localhost:3000',
+    siteName: 'Wavy Blog',
+    locale: 'en_US',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({
@@ -19,10 +28,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Navigation />
-        {children}
+        <main>{children}</main>
         <Footer />
         <Toaster />
       </body>

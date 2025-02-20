@@ -1,43 +1,35 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { Search, Menu, X } from 'lucide-react'
-import { cn } from '../../lib/utils'
+import { ChevronDown } from 'lucide-react'
 
 const menuItems = [
-  { href: '/', label: 'Home', icon: 'Home' },
-  { href: '/blog', label: 'Blog', icon: 'BookOpen' },
-  { href: '/features', label: 'Features', icon: 'Sparkles' },
-  { href: '/about', label: 'About', icon: 'Users' },
-  { href: '/contact', label: 'Contact', icon: 'Mail' },
+  { href: '/', label: 'Home' },
+  { 
+    href: '/header-styles', 
+    label: 'Header Styles',
+    hasDropdown: true 
+  },
+  { 
+    href: '/post-features', 
+    label: 'Post Features',
+    hasDropdown: true 
+  },
+  { href: '/tag', label: '#Tag' },
+  { 
+    href: '/features', 
+    label: 'Features',
+    hasDropdown: true 
+  },
+  { href: '/shop', label: 'Shop' },
+  { href: '/contact', label: 'Contact' },
 ]
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [hasScrolled, setHasScrolled] = useState(false)
   const pathname = usePathname()
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setHasScrolled(window.scrollY > 20)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    // Prevent body scroll when mobile menu is open
-    if (isOpen || isSearchOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen, isSearchOpen])
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -47,237 +39,113 @@ export default function Navigation() {
   }
 
   return (
-    <header 
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500",
-        hasScrolled 
-          ? "bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200/20 dark:border-gray-800/20 shadow-sm" 
-          : "bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg"
-      )}
-      role="banner"
-    >
-      {/* Navigation Background Overlay */}
-      <div 
-        className={cn(
-          "absolute inset-0 transition-opacity duration-500",
-          hasScrolled 
-            ? "opacity-100" 
-            : "opacity-0"
-        )}
-        aria-hidden="true"
-      />
+    <div className="relative bg-[#5CCFB9] w-full py-4">
+      {/* Decorative Elements */}
+      <div className="absolute left-4 top-1/2 -translate-y-1/2">
+        <div className="w-8 h-8 bg-[#E5B8E8]/30 rounded-full" />
+        <div className="w-12 h-2 bg-white/20 rounded-full -rotate-45 ml-4 mt-2" />
+      </div>
+      <div className="absolute right-4 top-1/2 -translate-y-1/2">
+        <div className="w-10 h-10 bg-[#B8E8B8]/30 rounded-full" />
+        <div className="w-12 h-2 bg-white/20 rounded-full rotate-45 -ml-4 mt-2" />
+      </div>
 
-      {/* Navigation Content */}
-      <div className="relative z-10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+      <header className="container mx-auto px-4 max-w-[1200px]">
+        <div className="bg-white/95 backdrop-blur-sm rounded-full shadow-lg px-6 py-4">
+          <div className="flex items-center justify-between">
             {/* Logo */}
             <Link 
               href="/" 
-              className="flex items-center transition-all duration-300 hover:scale-105 focus:scale-105 focus:outline-none"
-              aria-label="Go to homepage"
+              className="text-2xl font-bold tracking-tight italic"
+              style={{ fontFamily: "'Playfair Display', serif" }}
             >
-              <div className="flex items-center space-x-2">
-                <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                  <path
-                    d="M8 4C8 2.89543 8.89543 2 10 2H22C23.1046 2 24 2.89543 24 4V28C24 29.1046 23.1046 30 22 30H10C8.89543 30 8 29.1046 8 28V4Z"
-                    className="fill-pink-500 dark:fill-pink-400"
-                  />
-                  <path
-                    d="M10 8C10 6.89543 10.8954 6 12 6H20C21.1046 6 22 6.89543 22 8V24C22 25.1046 21.1046 26 20 26H12C10.8954 26 10 25.1046 10 24V8Z"
-                    className="fill-pink-600 dark:fill-pink-500"
-                  />
-                </svg>
-                <span className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white transition-colors duration-300">
-                  wavy
-                </span>
-                <span className="text-2xl text-pink-500 dark:text-pink-400">.</span>
-              </div>
+              groovy
             </Link>
 
             {/* Desktop Navigation */}
-            <nav 
-              className="hidden lg:flex lg:items-center lg:space-x-1"
-              role="navigation"
-              aria-label="Main navigation"
-            >
+            <nav className="hidden lg:flex lg:items-center lg:space-x-8">
               {menuItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={cn(
-                    "px-4 py-2 text-sm font-medium rounded-full transition-all duration-300",
-                    "hover:bg-gray-100/80 dark:hover:bg-gray-800/80",
-                    "focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
-                    isActive(item.href)
-                      ? "text-pink-500 dark:text-pink-400 bg-pink-50 dark:bg-pink-900/20"
-                      : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                  )}
-                  aria-current={isActive(item.href) ? 'page' : undefined}
+                  className={`text-sm font-medium hover:text-[#5CCFB9] transition-colors flex items-center space-x-1 ${
+                    isActive(item.href) ? 'text-[#5CCFB9]' : 'text-gray-600'
+                  }`}
                 >
-                  {item.label}
+                  <span>{item.label}</span>
+                  {item.hasDropdown && (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
                 </Link>
               ))}
             </nav>
 
-            {/* Desktop Right Section */}
-            <div className="hidden lg:flex lg:items-center lg:space-x-4">
-              <button
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className={cn(
-                  "p-2.5 transition-all duration-300 rounded-full",
-                  "hover:bg-gray-100/80 dark:hover:bg-gray-800/80",
-                  "focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
-                  "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                )}
-                aria-label={isSearchOpen ? "Close search" : "Open search"}
-                aria-expanded={isSearchOpen}
-              >
-                <Search className="w-5 h-5" aria-hidden="true" />
-              </button>
-              <Link
-                href="/subscribe"
-                className={cn(
-                  "inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300",
-                  "transform hover:scale-105 active:scale-95",
-                  "focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
-                  "text-white bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700"
-                )}
-              >
-                Subscribe
+            {/* Social Links */}
+            <div className="hidden lg:flex items-center space-x-4">
+              <Link href="https://facebook.com" className="text-gray-600 hover:text-[#5CCFB9] transition-colors">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+                </svg>
+              </Link>
+              <Link href="https://twitter.com" className="text-gray-600 hover:text-[#5CCFB9] transition-colors">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                </svg>
+              </Link>
+              <Link href="https://instagram.com" className="text-gray-600 hover:text-[#5CCFB9] transition-colors">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
+                </svg>
+              </Link>
+              <Link href="/rss.xml" className="text-gray-600 hover:text-[#5CCFB9] transition-colors">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12.8 16C12.8 8.978 7.022 3.2 0 3.2V0c8.777 0 16 7.223 16 16h-3.2zM2.194 11.61c1.21 0 2.195.985 2.195 2.196 0 1.21-.99 2.194-2.2 2.194C.98 16 0 15.017 0 13.806c0-1.21.983-2.195 2.194-2.195zM10.606 16h-3.11c0-4.113-3.383-7.497-7.496-7.497v-3.11c5.818 0 10.606 4.79 10.606 10.607z" />
+                </svg>
               </Link>
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="flex items-center lg:hidden">
-              <button
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className={cn(
-                  "p-2.5 transition-all duration-300 rounded-full",
-                  "hover:bg-gray-100/80 dark:hover:bg-gray-800/80",
-                  "focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
-                  "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                )}
-                aria-label={isSearchOpen ? "Close search" : "Open search"}
-                aria-expanded={isSearchOpen}
-              >
-                <Search className="w-5 h-5" aria-hidden="true" />
-              </button>
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={cn(
-                  "p-2.5 ml-2 transition-all duration-300 rounded-full",
-                  "hover:bg-gray-100/80 dark:hover:bg-gray-800/80",
-                  "focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
-                  "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                )}
-                aria-label={isOpen ? "Close menu" : "Open menu"}
-                aria-expanded={isOpen}
-              >
-                {isOpen ? (
-                  <X className="w-5 h-5" aria-hidden="true" />
-                ) : (
-                  <Menu className="w-5 h-5" aria-hidden="true" />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Search Overlay */}
-      {isSearchOpen && (
-        <div 
-          className="fixed inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg z-[60] transition-all duration-300"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Search"
-        >
-          <div className="container mx-auto px-4 sm:px-6 pt-24">
-            <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-              <input
-                type="search"
-                placeholder="Search articles..."
-                className={cn(
-                  "w-full h-14 pl-12 pr-4 text-lg rounded-2xl",
-                  "border-2 border-gray-200 dark:border-gray-700",
-                  "bg-white dark:bg-gray-800",
-                  "text-gray-900 dark:text-gray-100",
-                  "placeholder-gray-400 dark:placeholder-gray-500",
-                  "focus:outline-none focus:border-pink-500 dark:focus:border-pink-400",
-                  "transition-all duration-300"
-                )}
-                autoFocus
-                aria-label="Search articles"
-              />
-            </div>
             <button
-              onClick={() => setIsSearchOpen(false)}
-              className={cn(
-                "absolute top-4 right-4 p-2.5 rounded-full",
-                "text-gray-500 dark:text-gray-400",
-                "hover:bg-gray-100 dark:hover:bg-gray-800",
-                "focus:outline-none focus:ring-2 focus:ring-pink-500/50",
-                "transition-all duration-300"
-              )}
-              aria-label="Close search"
+              onClick={() => setIsOpen(!isOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
             >
-              <X className="w-6 h-6" aria-hidden="true" />
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                )}
+              </svg>
             </button>
           </div>
         </div>
-      )}
+      </header>
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 z-[60] bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg transition-all duration-300"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Mobile menu"
-        >
-          <nav 
-            className="h-full pt-20 pb-6 px-4 overflow-y-auto"
-            role="navigation"
-            aria-label="Mobile navigation"
-          >
-            {menuItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center px-4 py-3 text-base font-medium rounded-xl mb-2",
-                  "transition-all duration-300",
-                  "focus:outline-none focus:ring-2 focus:ring-pink-500/50",
-                  isActive(item.href)
-                    ? "text-pink-500 dark:text-pink-400 bg-pink-50 dark:bg-pink-900/20"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                )}
-                onClick={() => setIsOpen(false)}
-                aria-current={isActive(item.href) ? 'page' : undefined}
-              >
-                {item.label}
-              </Link>
-            ))}
-            <Link
-              href="/subscribe"
-              className={cn(
-                "block w-full text-center mt-6 px-6 py-3",
-                "text-sm font-medium rounded-xl",
-                "text-white bg-pink-500 dark:bg-pink-600",
-                "hover:bg-pink-600 dark:hover:bg-pink-700",
-                "focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:ring-offset-2",
-                "transform transition-all duration-300",
-                "hover:scale-[1.02] active:scale-[0.98]"
-              )}
-              onClick={() => setIsOpen(false)}
-            >
-              Subscribe
-            </Link>
-          </nav>
+        <div className="lg:hidden fixed inset-0 z-50 bg-white">
+          <div className="pt-20 pb-6 px-4">
+            <nav className="flex flex-col space-y-4">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`text-lg font-medium flex items-center justify-between ${
+                    isActive(item.href) ? 'text-[#5CCFB9]' : 'text-gray-600'
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <span>{item.label}</span>
+                  {item.hasDropdown && (
+                    <ChevronDown className="w-5 h-5" />
+                  )}
+                </Link>
+              ))}
+            </nav>
+          </div>
         </div>
       )}
-    </header>
+    </div>
   )
 } 

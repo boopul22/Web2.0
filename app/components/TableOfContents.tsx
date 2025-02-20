@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { cn } from '../../lib/utils'
 
 interface Heading {
@@ -9,11 +9,24 @@ interface Heading {
   level: number
 }
 
+interface HeadingLinkProps {
+  heading: Heading
+  isActive: boolean
+  onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void
+}
+
 export function TableOfContents() {
   const [headings, setHeadings] = useState<Heading[]>([])
   const [activeId, setActiveId] = useState<string>('')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return;
+    
     const elements = Array.from(document.querySelectorAll('h1, h2, h3'))
       .filter((element): element is HTMLElement => element instanceof HTMLElement)
       .map((element) => {
@@ -48,9 +61,9 @@ export function TableOfContents() {
     })
 
     return () => observer.disconnect()
-  }, [])
+  }, [mounted])
 
-  if (headings.length === 0) return null
+  if (!mounted || headings.length === 0) return null
 
   return (
     <nav className="space-y-2">

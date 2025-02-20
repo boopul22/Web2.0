@@ -1,0 +1,74 @@
+{
+    "name": "web2.0",
+    "version": "1.0.0",
+    "description": "Web 2.0 project configuration rules",
+    "engines": {
+        "node": ">=18.0.0",
+        "npm": ">=8.0.0"
+    },
+    "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "next": "^14.0.0",
+        "typescript": "^5.0.0",
+        "tailwindcss": "^3.3.0",
+        "postcss": "^8.4.0",
+        "autoprefixer": "^10.4.0"
+    },
+    "devDependencies": {
+        "eslint": "^8.0.0",
+        "prettier": "^3.0.0",
+        "@types/react": "^18.2.0",
+        "@types/node": "^18.0.0",
+        "jest": "^29.0.0",
+        "@testing-library/react": "^14.0.0"
+    },
+    "rules": {
+        "formatting": {
+            "indentation": "spaces",
+            "indentSize": 2,
+            "maxLineLength": 100,
+            "trailingComma": "es5",
+            "singleQuote": true,
+            "semi": true
+        },
+        "typescript": {
+            "strict": true,
+            "noImplicitAny": true,
+            "strictNullChecks": true,
+            "noUnusedLocals": true,
+            "noUnusedParameters": true
+        },
+        "seo": {
+            "metaTags": true,
+            "semanticHTML": true,
+            "imageAlt": true,
+            "headerHierarchy": true,
+            "robotsTxt": true,
+            "sitemapXml": true
+        },
+        "performance": {
+            "imageOptimization": true,
+            "lazyLoading": true,
+            "codeMinification": true,
+            "gzipCompression": true
+        },
+        "accessibility": {
+            "wcag2.1": true,
+            "ariaLabels": true,
+            "keyboardNavigation": true,
+            "colorContrast": true
+        },
+        "security": {
+            "httpOnly": true,
+            "xssProtection": true,
+            "csrfProtection": true,
+            "secureHeaders": true
+        },
+        "git": {
+            "conventionalCommits": true,
+            "branchNaming": "feature/|bugfix/|hotfix/|release/",
+            "prTemplate": true
+        }
+    }
+} 

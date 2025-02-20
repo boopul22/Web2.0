@@ -1,12 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  experimental: {
+    optimizeCss: false,
+  },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'efjhzxkrgobamihluyok.supabase.co',
-        port: '',
-        pathname: '/storage/v1/object/public/**',
+        hostname: '**',
       },
     ],
     dangerouslyAllowSVG: true,
@@ -35,11 +38,6 @@ const nextConfig = {
       ],
     },
   ],
-  experimental: {
-    serverActions: {
-      allowedOrigins: ['*'],
-    },
-  },
 };
 
 export default nextConfig;

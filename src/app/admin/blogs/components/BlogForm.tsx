@@ -3,8 +3,8 @@
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import Editor from '@/components/RichEditor'
-import ImageUpload from '@/components/ImageUpload'
+import Editor from '../../../../../components/RichEditor'
+import ImageUpload from '../../../../../components/ImageUpload'
 
 interface BlogFormProps {
   initialData?: {
@@ -165,7 +165,29 @@ export default function BlogForm({ initialData }: BlogFormProps) {
           Featured Image
         </label>
         <ImageUpload
-          onUpload={setImageUrl}
+          onImageSelect={async (file) => {
+            try {
+              const fileExt = file.name.split('.').pop()
+              const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`
+              const filePath = `blog-images/${fileName}`
+
+              const { error: uploadError } = await supabase.storage
+                .from('images')
+                .upload(filePath, file)
+
+              if (uploadError) throw uploadError
+
+              const { data: { publicUrl } } = supabase.storage
+                .from('images')
+                .getPublicUrl(filePath)
+
+              setImageUrl(publicUrl)
+            } catch (error) {
+              console.error('Error uploading image:', error)
+              setError('Failed to upload image')
+            }
+          }}
+          currentImage={imageUrl}
           className="w-full"
         />
         {imageUrl && (

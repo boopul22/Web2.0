@@ -3,13 +3,15 @@
 
 import React from 'react';
 
-type ErrorBoundaryProps = {
-  children?: React.ReactNode;
-};
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback: React.ReactNode;
+}
 
-type ErrorBoundaryState = {
+interface ErrorBoundaryState {
   hasError: boolean;
-};
+  error?: Error;
+}
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
@@ -17,19 +19,19 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: any): ErrorBoundaryState {
-    console.error('Unhandled error caught by ErrorBoundary:', error);
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
   }
 
-  componentDidCatch(error: any, errorInfo: any) {
-    console.error('Error info:', errorInfo);
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Blog error:', error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
-      return <div className="p-6 bg-red-50 text-red-600">Something went wrong.</div>;
+      return this.props.fallback;
     }
+
     return this.props.children;
   }
 }

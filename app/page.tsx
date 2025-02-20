@@ -2,48 +2,50 @@ import { Metadata } from 'next'
 import { Suspense } from 'react'
 import { Loader2 } from 'lucide-react'
 import BlogGrid from './components/BlogGrid'
+import ErrorBoundary from './components/ErrorBoundary'
 
 export const metadata: Metadata = {
-  title: 'Wavy Blog',
-  description: 'A curated space for thought-provoking articles and expert insights.',
-  keywords: 'blog, articles, insights',
+  title: 'Groovy - Creative Blog Platform',
+  description: 'Explore thought-provoking articles on travel, lifestyle, and health.',
+  keywords: 'blog, travel, lifestyle, health, articles',
   openGraph: {
-    title: 'Wavy Blog',
-    description: 'A curated space for thought-provoking articles and expert insights.',
+    title: 'Groovy - Creative Blog Platform',
+    description: 'Explore thought-provoking articles on travel, lifestyle, and health.',
     type: 'website',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Wavy Blog'
+        alt: 'Groovy Blog'
       }
     ]
   },
 }
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 3600 // Revalidate every hour
 
 export default async function HomePage() {
   return (
-    <main className="relative min-h-screen bg-white dark:bg-gray-950">
-      {/* Content wrapper with lower z-index than navigation */}
+    <main className="relative min-h-screen bg-[#5CCFB9]">
+      {/* Content wrapper */}
       <div className="relative z-0 w-full">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="pt-28 pb-16 sm:pt-36 sm:pb-24">
-            <Suspense 
-              fallback={
-                <div className="flex items-center justify-center min-h-[70vh]">
-                  <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Loading articles...</p>
+        <div className="container mx-auto px-4 max-w-[1200px]">
+          <div className="pt-28 pb-16">
+            <ErrorBoundary fallback={<div className="text-white">Something went wrong loading the blog posts. Please try again later.</div>}>
+              <Suspense 
+                fallback={
+                  <div className="flex items-center justify-center min-h-[70vh]">
+                    <div className="flex flex-col items-center gap-4">
+                      <Loader2 className="h-8 w-8 animate-spin text-white" />
+                      <p className="text-sm text-white/80">Loading articles...</p>
+                    </div>
                   </div>
-                </div>
-              }
-            >
-              <BlogGrid />
-            </Suspense>
+                }
+              >
+                <BlogGrid />
+              </Suspense>
+            </ErrorBoundary>
           </div>
         </div>
       </div>
