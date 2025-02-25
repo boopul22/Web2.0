@@ -13,9 +13,14 @@ export async function POST(request: Request) {
     const supabase = createRouteHandlerClient({ cookies })
     
     const usersPromises = userIds.map(async (id) => {
-      const { data: { user }, error } = await supabase.auth.admin.getUserById(id)
-      if (error || !user) return null
-      return { id: user.id, email: user.email }
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .eq('id', id)
+        .single()
+        
+      if (error || !data) return null
+      return { id: data.id, email: data.email }
     })
 
     const users = (await Promise.all(usersPromises)).filter((user): user is { id: string, email: string } => user !== null)

@@ -31,8 +31,8 @@ export default function LoginPage() {
         throw signInError;
       }
 
-      // Redirect to admin dashboard after successful login
-      router.push('/admin');
+      // Redirect to home page after successful login
+      router.push('/');
     } catch (err: any) {
       setError(err.message || 'An error occurred during login');
     } finally {
@@ -45,7 +45,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Admin Login
+            Login
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>

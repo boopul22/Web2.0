@@ -4,16 +4,17 @@ import Link from 'next/link'
 import Image from 'next/image'
 import React from 'react'
 
-interface Blog {
+interface Post {
   id: string
   title: string
   slug: string
-  excerpt: string
-  image_url: string
+  summary: string
+  content: string
+  featured_image: string
   created_at: string
-  author: string
-  category: string
-  read_time: number
+  author_id: string
+  status: string
+  published: boolean
 }
 
 const categoryColors = {
@@ -28,30 +29,31 @@ const categoryTextColors = {
   'Health': 'text-[#2E7B21] hover:text-[#1F5316]'
 } as const;
 
-async function getBlogs(): Promise<Blog[]> {
+async function getPosts(): Promise<Post[]> {
   const cookieStore = cookies()
   const supabase = createServerComponentClient({
     cookies: () => cookieStore
   })
   
-  const { data: blogs, error } = await supabase
-    .from('blogs')
+  const { data: posts, error } = await supabase
+    .from('posts')
     .select('*')
+    .eq('published', true)
     .order('created_at', { ascending: false })
-    .limit(12) // Limit to 12 most recent posts for better performance
+    .limit(12)
 
   if (error) {
     console.error('Supabase error:', error)
     throw new Error('Failed to fetch blog posts')
   }
 
-  return blogs as Blog[]
+  return posts as Post[]
 }
 
 export default async function BlogGrid() {
-  const blogs = await getBlogs()
+  const posts = await getPosts()
 
-  if (!blogs || blogs.length === 0) {
+  if (!posts || posts.length === 0) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
         <div className="text-center">
@@ -72,8 +74,8 @@ export default async function BlogGrid() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-6 gap-8 relative z-10">
-        {blogs.map((blog: Blog, index: number) => {
-          const { id, title, slug, excerpt, image_url, created_at, author, category, read_time } = blog;
+        {posts.map((post: Post, index: number) => {
+          const { id, title, slug, summary, featured_image, created_at } = post;
           
           // Determine card size based on index
           const isLarge = index === 0;
@@ -83,6 +85,9 @@ export default async function BlogGrid() {
             : isMedium 
               ? 'md:col-span-3 lg:col-span-2' 
               : 'md:col-span-2';
+
+          // Default category for now
+          const category = 'Lifestyle';
 
           return (
             <article 
@@ -98,10 +103,10 @@ export default async function BlogGrid() {
 
               {/* Featured Image Container */}
               <div className={`relative w-full overflow-hidden ${isLarge ? 'aspect-[16/9]' : isMedium ? 'aspect-[3/2]' : 'aspect-[4/3]'}`}>
-                {image_url ? (
+                {featured_image ? (
                   <>
                     <Image
-                      src={image_url}
+                      src={featured_image}
                       alt={title}
                       fill
                       className="object-cover transition-transform group-hover:scale-105"
@@ -140,19 +145,19 @@ export default async function BlogGrid() {
                     })}
                   </time>
                   <span>•</span>
-                  <span className="font-medium">{read_time} min read</span>
+                  <span className="font-medium">{Math.ceil(summary?.length / 200)} min read</span>
                 </div>
 
-                {/* Excerpt */}
-                <p className={`opacity-90 mb-6 font-medium ${isLarge ? 'line-clamp-3' : 'line-clamp-2'}`}>{excerpt}</p>
+                {/* Summary */}
+                <p className={`opacity-90 mb-6 font-medium ${isLarge ? 'line-clamp-3' : 'line-clamp-2'}`}>{summary}</p>
 
                 {/* Author and CTA */}
                 <div className="flex items-center justify-between pt-4 border-t border-current/10">
                   <div className="flex items-center gap-3">
                     <div className={`rounded-full bg-black/10 flex items-center justify-center ${isLarge ? 'w-12 h-12' : 'w-10 h-10'}`}>
-                      <span className={`text-current font-medium ${isLarge ? 'text-base' : 'text-sm'}`}>{author ? author[0] : 'A'}</span>
+                      <span className={`text-current font-medium ${isLarge ? 'text-base' : 'text-sm'}`}>A</span>
                     </div>
-                    <span className={`font-semibold ${isLarge ? 'text-base' : 'text-sm'}`}>{author || 'Anonymous'}</span>
+                    <span className={`font-semibold ${isLarge ? 'text-base' : 'text-sm'}`}>Author</span>
                   </div>
                   <Link 
                     href={`/blog/${slug}`}

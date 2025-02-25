@@ -31,13 +31,6 @@ export async function middleware(req: NextRequest) {
     // Store the current path in a cookie for the auth layout
     await res.cookies.set('path', req.nextUrl.pathname)
 
-    // If accessing admin routes, verify authentication
-    if (req.nextUrl.pathname.startsWith('/admin')) {
-      if (!session) {
-        return NextResponse.redirect(new URL('/login', req.url))
-      }
-    }
-    
     return res
   } catch (error) {
     console.error('Middleware error:', error)
@@ -45,10 +38,9 @@ export async function middleware(req: NextRequest) {
   }
 }
 
-// Only run middleware on admin routes and api routes
+// Updated matcher to remove admin routes
 export const config = {
   matcher: [
-    '/admin/:path*',
     '/api/:path*',
     '/((?!_next/static|_next/image|favicon.ico|public/).*)',
   ],

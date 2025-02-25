@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Navigation from './components/Navigation'
 import Footer from './components/Footer'
-import { Toaster } from "./components/ui/toaster"
+import { Toaster } from 'react-hot-toast'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,11 +29,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-[#5CCFB9] min-h-screen`}>
+      <body className={`${inter.className} bg-[#5CCFB9] min-h-screen`} suppressHydrationWarning>
         <Navigation />
         <main>{children}</main>
         <Footer />
-        <Toaster />
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+          }}
+        />
       </body>
     </html>
   )
