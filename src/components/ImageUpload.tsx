@@ -17,23 +17,23 @@ export default function ImageUpload({
   const [error, setError] = useState<string | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
 
-  const validateFile = (file: File): string | null => {
-    if (!file.type.startsWith('image/')) {
-      return 'Please upload an image file'
-    }
-
-    if (file.size > maxSize * 1024 * 1024) {
-      return `Image must be less than ${maxSize}MB`
-    }
-
-    return null
-  }
-
   const handleUpload = useCallback(async (file: File) => {
     setIsUploading(true)
     setError(null)
 
     // Validate file
+    const validateFile = (file: File): string | null => {
+      if (!file.type.startsWith('image/')) {
+        return 'Please upload an image file'
+      }
+
+      if (file.size > maxSize * 1024 * 1024) {
+        return `Image must be less than ${maxSize}MB`
+      }
+
+      return null
+    }
+
     const validationError = validateFile(file)
     if (validationError) {
       setError(validationError)

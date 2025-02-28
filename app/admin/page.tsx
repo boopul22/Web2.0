@@ -1,87 +1,77 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { User } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
-export default function AdminDashboard() {
+export default function AdminPage() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<{ email?: string } | null>(null);
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        router.push('/login');
-        return;
+    const checkSession = async () => {
+      try {
+        setLoading(true);
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          console.log('No session found, redirecting to login');
+          router.replace('/login?redirect=/admin');
+          return;
+        }
+
+        // Fetch user data if needed
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log('User data:', user);
+        setUserData(user);
+        
+      } catch (error) {
+        console.error('Error checking session:', error);
+        router.replace('/login?redirect=/admin');
+      } finally {
+        setLoading(false);
       }
-      
-      // You might want to check if the user has admin role here
-      // For example: 
-      // const { data } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-      // if (data?.role !== 'admin') {
-      //   router.push('/');
-      //   return;
-      // }
-      
-      setUser(session.user);
-      setLoading(false);
     };
 
-    checkUser();
-  }, [router, supabase]);
+    checkSession();
+  }, [router]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
           <h2 className="text-2xl font-semibold mb-2">Loading...</h2>
-          <p>Please wait while we check your credentials</p>
+          <p className="text-gray-600">Please wait while we verify your session</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600">Welcome back, {user?.email}</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Blog Posts</h2>
-          <p className="mb-4">Manage your existing blog posts or create new ones.</p>
-          <div className="flex space-x-4">
-            <button
-              onClick={() => router.push('/admin/posts')}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-            >
-              View All Posts
-            </button>
-            <button
-              onClick={() => router.push('/admin/posts/new')}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
-            >
-              Create New Post
-            </button>
+    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+        <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+          <div className="max-w-md mx-auto">
+            <div className="divide-y divide-gray-200">
+              <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+                <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+                {userData && <p className="mb-4">Welcome, {userData.email}</p>}
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold">Quick Actions</h2>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>
+                      <a href="/admin/posts" className="text-blue-600 hover:text-blue-800">
+                        Manage Posts
+                      </a>
+                    </li>
+                    {/* Add more admin actions here */}
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Media Library</h2>
-          <p className="mb-4">Manage images and other media files.</p>
-          <button
-            onClick={() => router.push('/admin/media')}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md"
-          >
-            Manage Media
-          </button>
         </div>
       </div>
     </div>

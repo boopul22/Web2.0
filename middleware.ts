@@ -1,47 +1,51 @@
-import { createServerClient } from '@supabase/ssr'
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  
   try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get: async (name) => {
-            const cookie = req.cookies.get(name)
-            return cookie?.value
-          },
-          set: async (name, value, options) => {
-            res.cookies.set({ name, value, ...options })
-          },
-          remove: async (name, options) => {
-            res.cookies.delete({ name, ...options })
-          },
-        },
+    const res = NextResponse.next()
+    const supabase = createMiddlewareClient({ req, res })
+
+    // Refresh session if expired - required for Server Components
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    console.log('Middleware - Current path:', req.nextUrl.pathname);
+    console.log('Middleware - Session exists:', !!session);
+
+    // If accessing admin routes without a session
+    if (req.nextUrl.pathname.startsWith('/admin')) {
+      if (!session) {
+        console.log('Middleware - No session, redirecting to login');
+        const redirectUrl = new URL('/login', req.url)
+        redirectUrl.searchParams.set('redirect', req.nextUrl.pathname)
+        return NextResponse.redirect(redirectUrl)
       }
-    )
-
-    // Refresh session if expired
-    const { data: { session } } = await supabase.auth.getSession()
-
-    // Store the current path in a cookie for the auth layout
-    await res.cookies.set('path', req.nextUrl.pathname)
+      console.log('Middleware - Session exists, allowing admin access');
+    }
 
     return res
   } catch (error) {
-    console.error('Middleware error:', error)
-    return res
+    console.error('Middleware error:', error);
+    // On error, redirect to login
+    const redirectUrl = new URL('/login', req.url)
+    return NextResponse.redirect(redirectUrl)
   }
 }
 
 // Updated matcher to remove admin routes
 export const config = {
   matcher: [
-    '/api/:path*',
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     * - api auth routes
+     */
+    '/((?!_next/static|_next/image|favicon.ico|public|api/auth).*)',
   ],
 }
