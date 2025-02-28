@@ -8,12 +8,15 @@ export const metadata: Metadata = {
   description: 'Sign in to your account',
 };
 
+interface PageProps {
+  params: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
 export default async function LoginPage({
-  searchParams = {},
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined }
-} = {}) {
-  const redirectPath = typeof searchParams.redirect === 'string' 
+  searchParams,
+}: PageProps) {
+  const redirectPath = typeof searchParams?.redirect === 'string' 
     ? searchParams.redirect 
     : '/admin';
 
